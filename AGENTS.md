@@ -5,7 +5,8 @@ Notes for coding agents working in this repository.
 ## Context
 
 - This is a **personal fork** of [ols](https://github.com/DanielGavin/ols), the Odin language server. Changes are not upstreamed, so don't open PRs or shape work for upstream review. Commit on local branches when asked.
-- Remotes: `origin` is the fork (`DevilMayGrind/ols`, SSH), `upstream` is `DanielGavin/ols` (fetch only; its push URL is disabled). On `master`, `git pull` merges from upstream and `git push` goes to the fork. `git sync` does both.
+- Remotes: `origin` is the fork (`DevilMayGrind/ols`, SSH), `upstream` is `DanielGavin/ols` (fetch only; its push URL is disabled). On `master`, `git pull` merges from upstream and `git push` goes to the fork. `git sync` does both, and runs the tests and rebuilds `./ols` before pushing. `rerere` is on, so a conflict resolved once is reused.
+- To keep upstream merges conflict-free, put fork code in **new files** (e.g. `src/server/completion_type_matching.odin`, `tests/fork_*_test.odin`) and keep edits to upstream files to small hooks. Never append to the end of an upstream file; upstream appends there too.
 - The owner uses **Neovim with blink.cmp**. Neovim runs the binary built here (`cmd = { '/home/alex/Projects/github/ols/ols' }` in `~/.config/nvim/lua/pack.lua`), so after changing server code, rebuild with `./build.sh` and restart the LSP (`:lsp restart`) to try it.
 
 ## Build and test
