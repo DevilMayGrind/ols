@@ -703,6 +703,9 @@ semantics_token :: proc(file: ^Semantics_File, offset: int) -> (type: SemanticTo
 			t = .Parameter
 		case .Variable:
 			t = .Variable
+			if e.pkg != "" {
+				m = {.GlobalScope} // `pkg` is empty for local entities
+			}
 		case .Type:
 			t, m = .Type, {.ReadOnly}
 			if e.type >= 0 {

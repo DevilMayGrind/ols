@@ -62,9 +62,17 @@ SemanticTokenModifier :: enum u8 {
 	Definition,
 	Deprecated,
 	ReadOnly,
+	GlobalScope, // mutable package-level variables
 }
 // Need to be in the same order as SemanticTokenModifier
-semantic_token_modifier_names: []string = {"declaration", "defaultLibrary", "definition", "deprecated", "readonly"}
+semantic_token_modifier_names: []string = {
+	"declaration",
+	"defaultLibrary",
+	"definition",
+	"deprecated",
+	"readonly",
+	"globalScope",
+}
 SemanticTokenModifiers :: bit_set[SemanticTokenModifier;u32]
 
 SemanticTokensRequest :: struct {
@@ -296,7 +304,11 @@ visit_node :: proc(node: ^ast.Node, builder: ^SemanticTokenBuilder) {
 	case ^ast.Assign_Stmt:
 		for l in n.lhs {
 			if ident, ok := l.derived.(^ast.Ident); ok {
-				write_semantic_node(builder, l, .Variable)
+				modifiers: SemanticTokenModifiers
+				if symbol_and_node, ok := builder.symbols[cast(uintptr)ident]; ok && is_global_variable_symbol(symbol_and_node.symbol) {
+					modifiers += {.GlobalScope}
+				}
+				write_semantic_node(builder, l, .Variable, modifiers)
 			} else {
 				visit_node(l, builder)
 			}
@@ -575,6 +587,18 @@ visit_import_decl :: proc(decl: ^ast.Import_Decl, builder: ^SemanticTokenBuilder
 	}
 }
 
+// A mutable variable declared at package scope
+is_global_variable_symbol :: proc(symbol: Symbol) -> bool {
+	if .Mutable not_in symbol.flags || symbol.type == .Field {
+		return false
+	}
+	// Variables of some types (e.g. `arr: [2]int`) resolve to the type's symbol, keeping only the flags
+	if symbol.type != .Variable && .Variable not_in symbol.flags {
+		return false
+	}
+	return card(symbol.flags & {.Local, .Parameter, .Builtin}) == 0
+}
+
 visit_ident :: proc(
 	ident: ^ast.Ident,
 	symbol_ptr: rawptr,
@@ -600,6 +624,10 @@ visit_ident :: proc(
 
 	if .Mutable not_in symbol.flags {
 		modifiers += {.ReadOnly}
+	}
+
+	if is_global_variable_symbol(symbol) {
+		modifiers += {.GlobalScope}
 	}
 
 	if .PolyType in symbol.flags {
