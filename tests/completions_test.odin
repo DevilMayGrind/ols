@@ -6558,3 +6558,62 @@ ast_completion_using_poly_struct :: proc(t: ^testing.T) {
 
 	test.expect_completion_docs(t, &source, ".", {"String.buf: [5]byte", "String.len: int"})
 }
+
+@(test)
+ast_completion_comp_lit_struct_fields_declaration_order :: proc(t: ^testing.T) {
+	source := test.Source {
+		main = `package test
+		Foo :: struct {
+			zeta:  int,
+			alpha: int,
+			mid:   int,
+		}
+		main :: proc() {
+			f := Foo{
+				{*}
+			}
+		}
+		`,
+	}
+	test.expect_completion_label_order(t, &source, "", {"zeta", "alpha", "mid"})
+}
+
+@(test)
+ast_completion_comp_lit_struct_fields_declaration_order_after_field :: proc(t: ^testing.T) {
+	source := test.Source {
+		main = `package test
+		Foo :: struct {
+			zeta:  int,
+			alpha: int,
+			mid:   int,
+			beta:  int,
+		}
+		main :: proc() {
+			f := Foo{
+				alpha = 1,
+				{*}
+			}
+		}
+		`,
+	}
+	test.expect_completion_label_order(t, &source, "", {"zeta", "mid", "beta"})
+}
+
+@(test)
+ast_completion_comp_lit_bit_field_fields_declaration_order :: proc(t: ^testing.T) {
+	source := test.Source {
+		main = `package test
+		Foo :: bit_field u8 {
+			zeta:  u8 | 2,
+			alpha: u8 | 3,
+			mid:   u8 | 3,
+		}
+		main :: proc() {
+			f := Foo{
+				{*}
+			}
+		}
+		`,
+	}
+	test.expect_completion_label_order(t, &source, "", {"zeta", "alpha", "mid"})
+}

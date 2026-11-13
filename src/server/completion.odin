@@ -24,6 +24,7 @@ CompletionResult :: struct {
 	completion_item: Maybe(CompletionItem), // if we provide the completion item it will just use that
 	detail:          string,
 	score:           f32,
+	decl_index:      int, // 1-based declaration order of a struct/bit_field field; 0 if not applicable
 }
 
 Completion_Type :: enum {
@@ -298,6 +299,10 @@ convert_completion_results :: proc(
 	slice.sort_by(results, proc(i, j: CompletionResult) -> bool {
 		if j.score != i.score {
 			return j.score < i.score
+		}
+		// Keep fields of a composite literal in declaration order
+		if i.decl_index != 0 && j.decl_index != 0 {
+			return i.decl_index < j.decl_index
 		}
 		return j.symbol.name > i.symbol.name
 	})
@@ -950,7 +955,7 @@ get_comp_lit_completion :: proc(
 					}
 
 					construct_struct_field_symbol(&resolved, symbol.name, v, i)
-					append(results, CompletionResult{symbol = resolved})
+					append(results, CompletionResult{symbol = resolved, decl_index = i + 1})
 				}
 			}
 			return false
@@ -968,7 +973,7 @@ get_comp_lit_completion :: proc(
 					}
 
 					construct_bit_field_field_symbol(&resolved, symbol.name, v, i)
-					append(results, CompletionResult{symbol = resolved})
+					append(results, CompletionResult{symbol = resolved, decl_index = i + 1})
 				}
 			}
 			return false
