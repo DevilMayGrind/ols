@@ -110,6 +110,16 @@ get_code_actions :: proc(
 		)
 	}
 
+	if position_context.comp_lit != nil {
+		add_fill_struct_fields_action(
+			&ast_context,
+			&position_context,
+			strings.clone(document.uri.uri, context.temp_allocator),
+			config,
+			&actions,
+		)
+	}
+
 	add_objc_block_handler_action(
 		document,
 		&ast_context,
