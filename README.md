@@ -133,6 +133,11 @@ Options:
 
 - `enable_code_action_invert_if`: Enables a code action to invert if statements.
 
+- `completion_type_matching`: How completion uses the expected type at the cursor (procedure arguments and struct literal field values):
+  - `"rank"` (default): values of the expected type, and procedures returning it, are listed first
+  - `"filter"`: also leave out values known to be of another type (keywords, packages and generic procedures are kept; nothing is filtered if nothing matches)
+  - `"none"`: no type-based ranking or filtering
+
 - `struct_fields_underscore_visibility`: Controls visibility of struct fields starting with `_`:
   - `""` (default): no hiding, all fields are visible
   - `"file"`: hide fields when accessed from outside the declaring file 

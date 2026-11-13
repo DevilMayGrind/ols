@@ -170,6 +170,12 @@
 			"description": "Enables a code action to invert if statements.",
 			"default": false
 		},
+		"completion_type_matching": {
+			"type": "string",
+			"description": "How completion uses the expected type at the cursor (procedure arguments and struct literal field values):\n\n- \"rank\" (default): values of the expected type, and procedures returning it, are listed first\n- \"filter\": also leave out values known to be of another type\n- \"none\": no type-based ranking or filtering",
+			"enum": ["rank", "filter", "none"],
+			"default": "rank"
+		},
 		"struct_fields_underscore_visibility": {
   			"type": "string",
   			"description": "Controls visibility of struct fields starting with `_`:\n\n- \"\" (default): no hiding; all fields are visible\n- \"file\": hide fields when accessed from outside the declaring file\n- \"package\": hide fields when accessed from outside the declaring package",

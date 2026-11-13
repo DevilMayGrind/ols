@@ -9,6 +9,13 @@ ConfigProfile :: struct {
 	exclude_path: [dynamic]string,
 }
 
+// How completion uses the expected type at the cursor (procedure argument, composite literal field value)
+CompletionTypeMatching :: enum {
+	Rank, // results of the expected type are listed first
+	Filter, // results known to be of another type are left out
+	None,
+}
+
 StructFieldUnderscoreMeaning :: enum {
 	None,
 	Private_File,
@@ -61,6 +68,7 @@ Config :: struct {
 	enable_comp_lit_signature_help_use_docs: bool,
 	enable_code_action_invert_if:            bool,
 	struct_fields_underscore_visibility:	 StructFieldUnderscoreMeaning,
+	completion_type_matching:                CompletionTypeMatching,
 	enable_parser_errors:                    bool,
 	enable_diagnostics:                      bool,
 	thread_count:                            int,

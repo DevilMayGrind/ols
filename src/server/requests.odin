@@ -495,6 +495,15 @@ read_ols_initialize_options :: proc(config: ^common.Config, ols_config: OlsConfi
 		}
 	}
 
+	switch ols_config.completion_type_matching {
+	case "rank":
+		config.completion_type_matching = .Rank
+	case "filter":
+		config.completion_type_matching = .Filter
+	case "none":
+		config.completion_type_matching = .None
+	}
+
 	if ols_config.struct_fields_underscore_visibility == "file" {
 		config.struct_fields_underscore_visibility = .Private_File
 	} else if ols_config.struct_fields_underscore_visibility == "package" {
